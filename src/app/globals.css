@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-display: var(--font-playfair), serif;
+  --grid-color: #f3f4f6;
+}
+
+.dark {
+  --grid-color: #1a1a1a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* Premium fluid transition across all theme changes */
+  transition-property: background-color, border-color, text-decoration-color, fill, stroke, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 400ms;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #FFFFFF;
+  color: #000000;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================
+   STARK MIDNIGHT (DARK MODE) EXPLICIT OVERRIDES
+   ========================================== */
+
+.dark body {
+  background-color: #080808 !important;
+  color: #FFFFFF !important;
+}
+
+/* Background Overrides */
+.dark .bg-white {
+  background-color: #080808 !important;
+}
+
+.dark .bg-white\/80 {
+  background-color: rgba(8, 8, 8, 0.8) !important;
+}
+
+.dark .bg-white\/95 {
+  background-color: rgba(8, 8, 8, 0.95) !important;
+}
+
+.dark .bg-white\/90 {
+  background-color: rgba(12, 12, 12, 0.9) !important;
+}
+
+.dark .bg-neutral-50 {
+  background-color: #0c0c0c !important;
+}
+
+.dark .bg-neutral-100 {
+  background-color: #121212 !important;
+}
+
+.dark .bg-neutral-200 {
+  background-color: #1a1a1a !important;
+}
+
+/* Typography Overrides */
+.dark .text-black,
+.dark .text-neutral-900,
+.dark .text-neutral-950,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4 {
+  color: #FFFFFF !important;
+}
+
+.dark .text-neutral-500 {
+  color: #a3a3a3 !important;
+}
+
+.dark .text-neutral-400 {
+  color: #737373 !important;
+}
+
+.dark .text-neutral-300 {
+  color: #404040 !important;
+}
+
+/* Borders & Dividers */
+.dark .border-black {
+  border-color: #FFFFFF !important;
+}
+
+.dark .border-neutral-100,
+.dark .border-neutral-200,
+.dark .border-neutral-200\/80,
+.dark .border-neutral-200\/50 {
+  border-color: #1a1a1a !important;
+}
+
+/* Component Level Overrides */
+.dark .group:hover {
+  border-color: #FFFFFF !important;
+}
+
+.dark .hover\:bg-black:hover {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.dark .hover\:text-black:hover {
+  color: #000000 !important;
+}
+
+.dark .hover\:border-black:hover {
+  border-color: #FFFFFF !important;
+}
+
+.dark .hover\:border-neutral-800:hover {
+  border-color: #ffffff !important;
+}
+
+/* Toggle specific logo overrides */
+.dark .fill-white {
+  fill: #000000 !important;
+}
+
+.dark .bg-black.dark\:bg-white {
+  background-color: #FFFFFF !important;
+}
+
+.dark .fill-white.dark\:fill-black {
+  fill: #000000 !important;
+}
+
+.dark .text-black.dark\:text-white {
+  color: #FFFFFF !important;
+}
