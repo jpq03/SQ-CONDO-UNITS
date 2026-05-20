@@ -43,7 +43,7 @@ export default function Home() {
         <div className="w-full flex justify-center">
           <div 
             className="flex flex-col items-center justify-center text-center w-full relative overflow-hidden py-24 px-8 md:py-32 md:px-16 min-h-[450px] shadow-2xl"
-            style={{ backgroundImage: "url('/condo-1.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+            style={{ backgroundImage: "url('/pacific-grande.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
           >
             {/* Premium Light Overlay to ensure black text legibility against dark window frames */}
             <div 
