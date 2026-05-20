@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import SearchBar from './SearchBar';
 
 const BACKGROUND_SLIDES = [
@@ -39,7 +40,21 @@ export default function Hero({ onSearch }) {
         aria-label="Hero section"
       >
         {/* Background Architectural Slideshow */}
-        <div className="absolute inset-0 z-0 select-none pointer-events-none">
+        <motion.div
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(e, info) => {
+            const threshold = 50;
+            if (info.offset.x < -threshold) {
+              setCurrentSlide((prev) => (prev + 1) % BACKGROUND_SLIDES.length);
+            } else if (info.offset.x > threshold) {
+              setCurrentSlide((prev) => (prev - 1 + BACKGROUND_SLIDES.length) % BACKGROUND_SLIDES.length);
+            }
+          }}
+          className="absolute inset-0 z-0 select-none cursor-grab active:cursor-grabbing"
+          style={{ touchAction: 'pan-y' }}
+        >
           {BACKGROUND_SLIDES.map((slide, index) => (
             <div
               key={slide}
@@ -49,13 +64,13 @@ export default function Hero({ onSearch }) {
               <img
                 src={slide}
                 alt={`Architectural Slideshow background ${index + 1}`}
-                className="w-full h-full object-cover object-center grayscale contrast-125 brightness-50"
+                className="w-full h-full object-cover object-center grayscale contrast-125 brightness-50 pointer-events-none"
               />
             </div>
           ))}
           {/* Soft vignetted dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/35 to-black/75 z-10" />
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/35 to-black/75 z-10 pointer-events-none" />
+        </motion.div>
 
         {/* Content Overlay */}
         <div className="relative z-20 max-w-screen-xl mx-auto w-full px-6 lg:px-8 pt-32 pb-24 flex flex-col items-center justify-center text-center flex-1">

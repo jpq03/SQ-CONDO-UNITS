@@ -20,6 +20,8 @@ export default function MapView({ filtered, onSelectCondo }) {
   const [Tooltip, setTooltip] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [activeCondo, setActiveCondo] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mapActive, setMapActive] = useState(true);
 
   useEffect(() => {
     // Dynamic import to avoid SSR issues
@@ -31,6 +33,18 @@ export default function MapView({ filtered, onSelectCondo }) {
     });
     import('leaflet/dist/leaflet.css');
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setMapActive(false);
+      else setMapActive(true);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Sync active condo when filters change
@@ -56,12 +70,40 @@ export default function MapView({ filtered, onSelectCondo }) {
 
   return (
     <div className="w-full aspect-square md:aspect-[21/9] border border-neutral-200 dark:border-neutral-800 mt-20 mb-12 overflow-hidden shadow-2xl relative">
+      {/* Tap to Interact Overlay on Mobile */}
+      {!mapActive && isMobile && (
+        <div 
+          onClick={() => setMapActive(true)}
+          className="absolute inset-0 bg-black/40 dark:bg-black/65 backdrop-blur-[1.5px] z-[1001] flex items-center justify-center cursor-pointer transition-all duration-300"
+        >
+          <div className="bg-white dark:bg-[#121212] border border-neutral-200 dark:border-neutral-800 px-5 py-3.5 shadow-2xl flex flex-col items-center gap-1 rounded-xl max-w-[240px] text-center">
+            <span className="text-xl">🗺️</span>
+            <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-neutral-900 dark:text-white">Tap to interact</span>
+            <span className="text-[8px] font-mono text-neutral-400 dark:text-neutral-500 uppercase mt-0.5">Enables zooming and panning</span>
+          </div>
+        </div>
+      )}
+
+      {/* Lock Map Escape Button on Mobile */}
+      {mapActive && isMobile && (
+        <button
+          type="button"
+          onClick={() => setMapActive(false)}
+          className="absolute top-4 right-4 z-[1002] bg-black/85 hover:bg-black text-white border border-neutral-800 px-3 py-1.5 text-[8px] font-mono tracking-widest uppercase rounded-lg shadow-lg active:scale-95 transition-all cursor-pointer"
+        >
+          🔒 Lock Map
+        </button>
+      )}
+
       <MapContainer
         center={[10.3103, 123.9494]}
         zoom={14}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
         attributionControl={false}
+        dragging={mapActive}
+        touchZoom={mapActive}
+        scrollWheelZoom={false}
       >
         {/* Dark-themed map tiles */}
         <TileLayer
