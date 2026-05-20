@@ -82,7 +82,7 @@ export default function Hero({ onSearch }) {
 
           {/* Optical sizing: Main Silence in Structure Title */}
           <h1
-            className="text-3xl md:text-6xl font-black text-white uppercase tracking-wider leading-none mb-10 max-w-4xl transition-all duration-300"
+            className="text-[clamp(2rem,7vw,4.5rem)] font-black text-white uppercase tracking-wider leading-[1.1] mb-10 max-w-4xl transition-all duration-300"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             The Grid<br />

@@ -66,7 +66,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Contacts Grid - Floating card layout with hover lift */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 w-full max-w-6xl mx-auto justify-center justify-items-center">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6 md:gap-8 w-full max-w-6xl mx-auto justify-center justify-items-center">
           {contacts.map((contact) => {
             const hrefMap = {
               Email: 'mailto:owner@sqcondounits.com',

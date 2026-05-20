@@ -87,7 +87,7 @@ export default function LocationHighlights() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 w-full max-w-6xl mx-auto justify-center justify-items-center">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-6 md:gap-8 w-full max-w-6xl mx-auto justify-center justify-items-center">
           {LANDMARKS.map((landmark, index) => (
             <motion.div
               key={landmark.name}
