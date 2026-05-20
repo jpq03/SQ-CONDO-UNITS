@@ -22,6 +22,14 @@ export default function SearchBar({ onSearch }) {
     if (onSearch) {
       onSearch({ location, checkIn, checkOut, guests });
     }
+
+    // Direct WhatsApp notification to the owner
+    const dateQuery = checkIn && checkOut ? ` from ${checkIn} to ${checkOut}` : checkIn ? ` starting ${checkIn}` : '';
+    const message = `Hi Sheena! I am inquiring about renting an SQ Condo Unit in ${location || 'Cebu Lapu-Lapu'}${dateQuery} for ${guests} guest${guests > 1 ? 's' : ''}. Are there units available?`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/639171234567?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const inputClass = () =>
@@ -196,9 +204,9 @@ export default function SearchBar({ onSearch }) {
         className="bg-white text-black hover:bg-neutral-100 font-bold uppercase tracking-widest text-[10px] px-6 py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2.5 shrink-0 group ml-2 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
       >
         <svg className="w-4 h-4 transition-transform duration-300 group-hover:scale-110 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        <span>Search</span>
+        <span>Search & Inquire</span>
       </button>
     </form>
   );
