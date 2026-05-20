@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 const locations = ['Cebu Lapu-Lapu'];
 
-export default function SearchBar() {
+export default function SearchBar({ onSearch }) {
   const [location, setLocation] = useState('Cebu Lapu-Lapu');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -19,7 +19,9 @@ export default function SearchBar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    alert(`Searching: ${location} · ${checkIn || 'Anytime'} → ${checkOut || 'Anytime'} · ${guests} guest(s)`);
+    if (onSearch) {
+      onSearch({ location, checkIn, checkOut, guests });
+    }
   };
 
   const inputClass = () =>
@@ -28,14 +30,14 @@ export default function SearchBar() {
   return (
     <form
       onSubmit={handleSearch}
-      className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl md:rounded-full w-full py-4 px-4 md:px-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 md:gap-0 shadow-2xl relative z-30"
+      className="backdrop-blur-2xl bg-black/45 dark:bg-black/60 border border-white/15 rounded-3xl md:rounded-full w-full p-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 md:gap-0 shadow-2xl relative z-30 transition-all duration-300"
       role="search"
       aria-label="Search condos"
     >
       {/* Location Selector */}
-      <div className="relative flex-1 min-w-[150px] border-b border-white/10 md:border-b-0 md:border-r md:border-white/15 pb-3 md:pb-0 md:pr-5">
+      <div className="relative flex-1 min-w-[150px] border-b border-white/10 md:border-b-0 md:border-r md:border-white/15 pb-2 md:pb-0 md:pr-2">
         <div
-          className="flex flex-col cursor-pointer transition-opacity duration-200 hover:opacity-80 items-start text-left md:pl-5"
+          className="flex flex-col cursor-pointer transition-all duration-300 hover:bg-white/5 rounded-2xl py-2 pl-6 pr-4 md:pl-8 md:pr-4 lg:pl-10 lg:pr-5 items-start text-left"
           onClick={() => { setFocused('location'); setShowLocations(true); }}
         >
           <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Where</span>
@@ -55,7 +57,7 @@ export default function SearchBar() {
 
         {/* Location dropdown */}
         {showLocations && (
-          <div className="absolute top-full mt-4 left-0 w-64 bg-white dark:bg-[#0c0c0c] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 py-2 overflow-hidden">
+          <div className="absolute top-full mt-4 left-4 md:left-6 lg:left-8 w-64 bg-white dark:bg-[#0c0c0c] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 py-2 overflow-hidden">
             {locations
               .filter((l) => l.toLowerCase().includes(location.toLowerCase()))
               .map((l) => (
@@ -78,17 +80,19 @@ export default function SearchBar() {
 
       {/* Check-in Date Input */}
       <div
-        className="flex flex-col flex-1 min-w-[120px] cursor-pointer transition-opacity duration-200 hover:opacity-80 border-b border-white/10 md:border-b-0 md:border-r md:border-white/15 pb-3 md:pb-0 md:px-5 items-start text-left relative"
+        className="flex flex-col flex-1 min-w-[120px] cursor-pointer border-b border-white/10 md:border-b-0 md:border-r md:border-white/15 pb-2 md:pb-0 relative"
         onClick={() => { setFocused('checkin'); setShowCheckInCal(true); setShowCheckOutCal(false); setShowLocations(false); }}
       >
-        <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Check-in</span>
-        <div className={`mt-0.5 text-xs font-bold ${checkIn ? 'text-white' : 'text-neutral-400'}`}>
-          {checkIn || 'Add dates'}
+        <div className="flex flex-col transition-all duration-300 hover:bg-white/5 rounded-2xl py-2 px-4 md:px-5 items-start text-left w-full">
+          <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Check-in</span>
+          <div className={`mt-0.5 text-xs font-bold ${checkIn ? 'text-white' : 'text-neutral-400'}`}>
+            {checkIn || 'Add dates'}
+          </div>
         </div>
         
         {showCheckInCal && (
           <div 
-            className="absolute top-full mt-4 left-0 w-72 bg-white dark:bg-[#0c0c0c] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 p-5 cursor-default"
+            className="absolute top-full mt-4 left-0 md:left-5 w-72 bg-white dark:bg-[#0c0c0c] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 p-5 cursor-default"
             onMouseLeave={() => setShowCheckInCal(false)}
           >
             <div className="flex justify-between items-center mb-4">
@@ -120,17 +124,19 @@ export default function SearchBar() {
 
       {/* Check-out Date Input */}
       <div
-        className="flex flex-col flex-1 min-w-[120px] cursor-pointer transition-opacity duration-200 hover:opacity-80 border-b border-white/10 md:border-b-0 md:border-r md:border-white/15 pb-3 md:pb-0 md:px-5 items-start text-left relative"
+        className="flex flex-col flex-1 min-w-[120px] cursor-pointer border-b border-white/10 md:border-b-0 md:border-r md:border-white/15 pb-2 md:pb-0 relative"
         onClick={() => { setFocused('checkout'); setShowCheckOutCal(true); setShowCheckInCal(false); setShowLocations(false); }}
       >
-        <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Check-out</span>
-        <div className={`mt-0.5 text-xs font-bold ${checkOut ? 'text-white' : 'text-neutral-400'}`}>
-          {checkOut || 'Add dates'}
+        <div className="flex flex-col transition-all duration-300 hover:bg-white/5 rounded-2xl py-2 px-4 md:px-5 items-start text-left w-full">
+          <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Check-out</span>
+          <div className={`mt-0.5 text-xs font-bold ${checkOut ? 'text-white' : 'text-neutral-400'}`}>
+            {checkOut || 'Add dates'}
+          </div>
         </div>
 
         {showCheckOutCal && (
           <div 
-            className="absolute top-full mt-4 left-0 md:-left-32 w-72 bg-white dark:bg-[#0c0c0c] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 p-5 cursor-default"
+            className="absolute top-full mt-4 left-0 md:-left-24 w-72 bg-white dark:bg-[#0c0c0c] rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 z-50 p-5 cursor-default"
             onMouseLeave={() => setShowCheckOutCal(false)}
           >
             <div className="flex justify-between items-center mb-4">
@@ -161,33 +167,35 @@ export default function SearchBar() {
       </div>
 
       {/* Guests */}
-      <div className="flex flex-col flex-1 min-w-[120px] pb-3 md:pb-0 md:px-5 items-start text-left">
-        <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Guests</span>
-        <div className="flex items-center gap-4 mt-0.5 w-full">
-          <button
-            type="button"
-            onClick={() => setGuests((g) => Math.max(1, g - 1))}
-            className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
-          >
-            −
-          </button>
-          <span className="text-xs font-bold text-white w-2 text-center">{guests}</span>
-          <button
-            type="button"
-            onClick={() => setGuests((g) => Math.min(16, g + 1))}
-            className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
-          >
-            +
-          </button>
+      <div className="flex flex-col flex-1 min-w-[120px] pb-2 md:pb-0 relative">
+        <div className="flex flex-col transition-all duration-300 hover:bg-white/5 rounded-2xl py-2 px-4 md:px-5 items-start text-left w-full">
+          <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70 block">Guests</span>
+          <div className="flex items-center gap-4 mt-0.5 w-full">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setGuests((g) => Math.max(1, g - 1)); }}
+              className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors cursor-pointer"
+            >
+              −
+            </button>
+            <span className="text-xs font-bold text-white w-2 text-center">{guests}</span>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setGuests((g) => Math.min(16, g + 1)); }}
+              className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors cursor-pointer"
+            >
+              +
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Submit Button */}
       <button
         type="submit"
-        className="bg-transparent hover:bg-white/10 text-white font-black uppercase tracking-widest text-[11px] px-5 py-4 rounded-full transition-all duration-300 flex items-center justify-center gap-3 shrink-0 group ml-1"
+        className="bg-white text-black hover:bg-neutral-100 font-bold uppercase tracking-widest text-[10px] px-6 py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2.5 shrink-0 group ml-2 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
       >
-        <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-4 h-4 transition-transform duration-300 group-hover:scale-110 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <span>Search</span>

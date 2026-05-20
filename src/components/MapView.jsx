@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Condo coordinates in Lapu-Lapu City area
 const CONDO_PINS = [
@@ -18,6 +19,7 @@ export default function MapView({ filtered, onSelectCondo }) {
   const [CircleMarker, setCircleMarker] = useState(null);
   const [Tooltip, setTooltip] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [activeCondo, setActiveCondo] = useState(null);
 
   useEffect(() => {
     // Dynamic import to avoid SSR issues
@@ -30,6 +32,13 @@ export default function MapView({ filtered, onSelectCondo }) {
     import('leaflet/dist/leaflet.css');
     setMounted(true);
   }, []);
+
+  // Sync active condo when filters change
+  useEffect(() => {
+    if (activeCondo && !filtered.some(c => c.id === activeCondo.id)) {
+      setActiveCondo(null);
+    }
+  }, [filtered, activeCondo]);
 
   if (!mounted || !MapContainer || !TileLayer || !CircleMarker || !Tooltip) {
     return (
@@ -46,7 +55,7 @@ export default function MapView({ filtered, onSelectCondo }) {
   const visiblePins = CONDO_PINS.filter(p => filteredIds.includes(p.id));
 
   return (
-    <div className="w-full aspect-square md:aspect-[21/9] border border-neutral-800 mt-20 mb-12 overflow-hidden shadow-2xl relative">
+    <div className="w-full aspect-square md:aspect-[21/9] border border-neutral-200 dark:border-neutral-800 mt-20 mb-12 overflow-hidden shadow-2xl relative">
       <MapContainer
         center={[10.3103, 123.9494]}
         zoom={14}
@@ -59,47 +68,51 @@ export default function MapView({ filtered, onSelectCondo }) {
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
 
-        {visiblePins.map((pin) => (
-          <CircleMarker
-            key={pin.id}
-            center={[pin.lat, pin.lng]}
-            radius={8}
-            fillColor="#ffffff"
-            fillOpacity={0.9}
-            stroke={true}
-            color="#ffffff"
-            weight={2}
-            eventHandlers={{
-              click: () => {
-                const condo = filtered.find(c => c.id === pin.id);
-                if (condo && onSelectCondo) onSelectCondo(condo);
-              },
-            }}
-          >
-            <Tooltip
-              direction="top"
-              offset={[0, -12]}
-              className="leaflet-dark-tooltip"
+        {visiblePins.map((pin) => {
+          const isSelected = activeCondo?.id === pin.id;
+          return (
+            <CircleMarker
+              key={pin.id}
+              center={[pin.lat, pin.lng]}
+              radius={isSelected ? 10 : 7}
+              fillColor={isSelected ? "#000000" : "#ffffff"}
+              fillOpacity={0.9}
+              stroke={true}
+              color={isSelected ? "#ffffff" : "#000000"}
+              weight={isSelected ? 3 : 2}
+              eventHandlers={{
+                click: () => {
+                  const condo = filtered.find(c => c.id === pin.id);
+                  if (condo) setActiveCondo(condo);
+                },
+              }}
             >
-              <div style={{
-                background: '#000',
-                color: '#fff',
-                padding: '6px 12px',
-                fontSize: '10px',
-                fontWeight: 800,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                border: '1px solid #333',
-                fontFamily: 'monospace',
-              }}>
-                {pin.title}<br />
-                <span style={{ fontWeight: 400, color: '#aaa' }}>
-                  {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0 }).format(pin.price)}
-                </span>
-              </div>
-            </Tooltip>
-          </CircleMarker>
-        ))}
+              <Tooltip
+                direction="top"
+                offset={[0, -12]}
+                className="leaflet-dark-tooltip"
+              >
+                <div style={{
+                  background: isSelected ? '#fff' : '#000',
+                  color: isSelected ? '#000' : '#fff',
+                  padding: '6px 12px',
+                  fontSize: '9px',
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  border: '1px solid #333',
+                  fontFamily: 'monospace',
+                  transition: 'all 0.2s ease',
+                }}>
+                  {pin.title}<br />
+                  <span style={{ fontWeight: 400, color: isSelected ? '#444' : '#aaa' }}>
+                    {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0 }).format(pin.price)}
+                  </span>
+                </div>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
       </MapContainer>
 
       {/* Map Label Overlay */}
@@ -108,6 +121,76 @@ export default function MapView({ filtered, onSelectCondo }) {
           Lapu-Lapu City, Cebu
         </span>
       </div>
+
+      {/* Glassmorphic Property Preview Card Overlay */}
+      <AnimatePresence>
+        {activeCondo && (
+          <motion.div
+            initial={{ opacity: 0, y: 15, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 15, scale: 0.96 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 250 }}
+            className="absolute bottom-4 right-4 left-4 sm:left-auto sm:w-80 z-[1000] backdrop-blur-md bg-black/85 dark:bg-[#0c0c0c]/90 border border-neutral-200 dark:border-neutral-800 p-4 shadow-2xl flex flex-col gap-3"
+          >
+            <div className="flex justify-between items-start gap-4">
+              <span className="text-[8px] font-mono tracking-[0.2em] text-neutral-400 dark:text-neutral-500 uppercase">
+                Unit Preview // 0{activeCondo.id}
+              </span>
+              <button
+                onClick={() => setActiveCondo(null)}
+                className="text-neutral-400 hover:text-white transition-colors text-sm leading-none cursor-pointer"
+                aria-label="Dismiss preview"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="w-20 h-20 bg-neutral-900 border border-neutral-800 shrink-0 overflow-hidden relative">
+                {activeCondo.images && activeCondo.images.length > 0 ? (
+                  <img
+                    src={activeCondo.images[0]}
+                    alt={activeCondo.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center font-mono text-[7px] text-neutral-600">
+                    NO IMAGE
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-[10px] font-bold font-mono uppercase tracking-wider text-white line-clamp-1">
+                    {activeCondo.title}
+                  </h4>
+                  <p className="text-[8px] text-neutral-400 font-mono mt-1 line-clamp-1">
+                    {activeCondo.street}
+                  </p>
+                </div>
+                <div className="text-xs font-serif font-bold text-white">
+                  {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0 }).format(activeCondo.price)}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center border-t border-neutral-900 pt-3 mt-1">
+              <span className="text-[8px] font-mono text-neutral-400 uppercase tracking-widest">
+                📐 {activeCondo.area} · 🛏️ {activeCondo.beds} beds
+              </span>
+              <button
+                onClick={() => {
+                  if (onSelectCondo) onSelectCondo(activeCondo);
+                }}
+                className="bg-white hover:bg-neutral-200 text-black text-[9px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 transition-colors cursor-pointer"
+              >
+                Inquire Details
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style jsx global>{`
         .leaflet-dark-tooltip {

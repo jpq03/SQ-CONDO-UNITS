@@ -35,7 +35,7 @@ export default function FAQSection() {
 
   return (
     <section className="bg-white dark:bg-[#080808] border-t border-neutral-200 dark:border-neutral-900" aria-label="Frequently Asked Questions">
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-8 border-x border-neutral-200 dark:border-neutral-900 py-20 md:py-28">
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-8 py-20 md:py-28">
 
         {/* Header */}
         <div className="max-w-2xl mx-auto flex flex-col items-center justify-center text-center mb-20">

@@ -65,7 +65,7 @@ const CONDOS = [
   {
     id: 4,
     title: 'PENTHOUSE OMEGA // DUPLEX 04',
-    location: 'Lapu-Lapu, Cebu',
+    location: 'Cebu Lapu-Lapu',
     price: 15800000,
     rating: 4.99,
     reviews: 56,
@@ -78,7 +78,7 @@ const CONDOS = [
     wifiSpeed: 600,
     cclexDist: '4m',
     beachDist: '9m',
-    images: [],
+    images: ['/penthouse_omega.png'],
   },
   {
     id: 5,
@@ -96,7 +96,7 @@ const CONDOS = [
     wifiSpeed: 300,
     cclexDist: '10m',
     beachDist: '2m',
-    images: [],
+    images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'],
   },
   {
     id: 6,
@@ -114,18 +114,17 @@ const CONDOS = [
     wifiSpeed: 450,
     cclexDist: '6m',
     beachDist: '7m',
-    images: [],
+    images: ['https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80'],
   },
 ];
 
 const FILTERS = ['All', 'Studio', '1 Bed', '2+ Beds', 'With Pool', 'Pet Friendly'];
 
-export default function CondoGrid() {
+export default function CondoGrid({ searchParams }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [visibleCount, setVisibleCount] = useState(6);
   const [selectedCondo, setSelectedCondo] = useState(null);
   const [viewMode, setViewMode] = useState('list');
-  const [priceRange, setPriceRange] = useState([0, 20000000]);
   const [loading, setLoading] = useState(true);
 
   // Simulate initial loading
@@ -134,10 +133,24 @@ export default function CondoGrid() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Filter Logic matching property variables
+  // Filter Logic matching property variables and searchParams
   const filtered = CONDOS.filter((c) => {
-    // Price filter always applies
-    if (c.price < priceRange[0] || c.price > priceRange[1]) return false;
+    // 2. Search parameters filter
+    if (searchParams) {
+      if (searchParams.location) {
+        const query = searchParams.location.toLowerCase().trim();
+        const matchesLocation = 
+          c.location.toLowerCase().includes(query) || 
+          c.title.toLowerCase().includes(query) || 
+          c.street.toLowerCase().includes(query);
+        if (!matchesLocation) return false;
+      }
+      if (searchParams.guests && c.beds < searchParams.guests) {
+        return false;
+      }
+    }
+
+    // 3. Category Filter pills
     if (activeFilter === 'All') return true;
     if (activeFilter === 'Studio') return c.beds === 1 && c.price < 5000000;
     if (activeFilter === '1 Bed') return c.beds === 1;
@@ -149,7 +162,7 @@ export default function CondoGrid() {
 
   return (
     <section id="listings" className="bg-white dark:bg-[#080808] border-t border-neutral-200 dark:border-neutral-900" aria-label="Featured Listings">
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-8 border-x border-neutral-200 dark:border-neutral-900 py-20 md:py-28">
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-8 py-20 md:py-28">
 
         {/* Stark Editorial Collection Header matching photo */}
         <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-black dark:border-neutral-800 pb-4 mb-8">
@@ -168,16 +181,16 @@ export default function CondoGrid() {
         </div>
 
         {/* Filter pills and View Toggle */}
-        <div className="flex flex-col lg:flex-row justify-between items-center mb-6 gap-8">
-          <div className="flex flex-wrap gap-3 justify-center">
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-8 gap-8">
+          <div className="flex flex-wrap gap-2.5 justify-center">
             {FILTERS.map((f) => (
               <button
                 key={f}
                 id={`filter-${f.replace(/\s+/g, '-').toLowerCase()}`}
                 onClick={() => setActiveFilter(f)}
-                className={`px-6 py-2.5 rounded-none text-[10px] font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${activeFilter === f
-                  ? 'bg-black text-white border border-black dark:bg-white dark:text-black dark:border-white shadow-lg scale-[1.02]'
-                  : 'bg-neutral-100 text-neutral-500 border border-neutral-100 hover:border-black hover:text-black hover:bg-white dark:bg-[#111] dark:text-neutral-500 dark:border-[#111] dark:hover:border-white dark:hover:text-white dark:hover:bg-transparent'
+                className={`px-5 py-2 rounded-full text-[9px] font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${activeFilter === f
+                  ? 'bg-black text-white dark:bg-white dark:text-black shadow-lg scale-[1.02]'
+                  : 'bg-neutral-50 text-neutral-500 border border-neutral-200/50 hover:border-black hover:text-black hover:bg-white dark:bg-neutral-900/30 dark:text-neutral-400 dark:border-neutral-800/40 dark:hover:border-white dark:hover:text-white dark:hover:bg-transparent'
                   }`}
               >
                 {f}
@@ -185,45 +198,32 @@ export default function CondoGrid() {
             ))}
           </div>
 
-          {/* List / Map Toggle */}
-          <div className="flex items-center gap-1 border border-neutral-200 dark:border-neutral-800 p-1 shrink-0">
-            <button onClick={() => setViewMode('list')} className={`px-8 py-2.5 text-[9px] font-bold tracking-widest uppercase transition-all duration-300 ${viewMode === 'list' ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-transparent text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'}`}>List</button>
-            <button onClick={() => setViewMode('map')} className={`px-8 py-2.5 text-[9px] font-bold tracking-widest uppercase transition-all duration-300 ${viewMode === 'map' ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-transparent text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'}`}>Map</button>
+          {/* List / Map Sliding Switch */}
+          <div className="relative flex items-center bg-neutral-100 dark:bg-neutral-900/50 p-1 rounded-full w-44 border border-neutral-200/50 dark:border-neutral-800/50 shrink-0">
+            <div
+              className={`absolute top-1 bottom-1 w-20 bg-black dark:bg-white rounded-full shadow-md transition-all duration-300 ${
+                viewMode === 'map' ? 'translate-x-20' : 'translate-x-0'
+              }`}
+            />
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex-1 text-[9px] font-bold z-10 uppercase tracking-widest text-center transition-colors duration-300 py-1.5 ${
+                viewMode === 'list' ? 'text-white dark:text-black' : 'text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'
+              }`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex-1 text-[9px] font-bold z-10 uppercase tracking-widest text-center transition-colors duration-300 py-1.5 ${
+                viewMode === 'map' ? 'text-white dark:text-black' : 'text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white'
+              }`}
+            >
+              Map
+            </button>
           </div>
         </div>
 
-        {/* Price Range Slider */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-10 py-4 px-6 border border-neutral-200 dark:border-neutral-800">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 shrink-0">Price Range</span>
-          <div className="flex-1 flex items-center gap-4 w-full">
-            <span className="text-[10px] font-mono font-bold text-black dark:text-white shrink-0 w-24">
-              {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0, notation: 'compact' }).format(priceRange[0])}
-            </span>
-            <div className="flex-1 relative h-8 flex items-center">
-              <input
-                type="range"
-                min={0}
-                max={20000000}
-                step={500000}
-                value={priceRange[0]}
-                onChange={(e) => setPriceRange([Math.min(Number(e.target.value), priceRange[1] - 500000), priceRange[1]])}
-                className="absolute w-full h-[2px] bg-neutral-300 dark:bg-neutral-700 appearance-none cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:dark:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-20"
-              />
-              <input
-                type="range"
-                min={0}
-                max={20000000}
-                step={500000}
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([priceRange[0], Math.max(Number(e.target.value), priceRange[0] + 500000)])}
-                className="absolute w-full h-[2px] bg-transparent appearance-none cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:dark:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-20"
-              />
-            </div>
-            <span className="text-[10px] font-mono font-bold text-black dark:text-white shrink-0 w-24 text-right">
-              {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0, notation: 'compact' }).format(priceRange[1])}
-            </span>
-          </div>
-        </div>
 
         {/* Grid structured with stark horizontal negative space gutters */}
         {loading ? (

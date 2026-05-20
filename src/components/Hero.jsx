@@ -9,7 +9,7 @@ const BACKGROUND_SLIDES = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80', // Luxury Minimalist Concrete Residence
 ];
 
-export default function Hero() {
+export default function Hero({ onSearch }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSearchSticky, setIsSearchSticky] = useState(false);
   const searchRef = useRef(null);
@@ -78,7 +78,7 @@ export default function Hero() {
 
           {/* Dynamic Search Bar overlay */}
           <div ref={searchRef} className="w-full max-w-4xl mt-4">
-            <SearchBar />
+            <SearchBar onSearch={onSearch} />
           </div>
 
         </div>
@@ -107,7 +107,7 @@ export default function Hero() {
       >
         <div className="max-w-screen-xl mx-auto px-4 lg:px-6 py-2">
           <div className="transform scale-[0.92] origin-top">
-            <SearchBar />
+            <SearchBar onSearch={onSearch} />
           </div>
         </div>
       </div>

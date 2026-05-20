@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import CondoGrid from '@/components/CondoGrid';
@@ -6,13 +9,34 @@ import LocationHighlights from '@/components/LocationHighlights';
 import FAQSection from '@/components/FAQ';
 import BackToTop from '@/components/BackToTop';
 import Footer from '@/components/Footer';
+import Toast from '@/components/Toast';
 
 export default function Home() {
+  const [searchParams, setSearchParams] = useState(null);
+
+  const handleSearch = (params) => {
+    setSearchParams(params);
+    // Smooth scroll to listings grid
+    const listingsElement = document.getElementById('listings');
+    if (listingsElement) {
+      listingsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Trigger toast notification
+    const event = new CustomEvent('show-toast', {
+      detail: { 
+        message: `Listing parameters updated for: ${params.location || 'Anywhere'} · ${params.guests} Guest(s)`,
+        type: 'info'
+      }
+    });
+    window.dispatchEvent(event);
+  };
+
   return (
     <main className="min-h-screen bg-white text-black dark:bg-[#080808] dark:text-white transition-colors duration-300">
       <Navbar />
-      <Hero />
-      <CondoGrid />
+      <Hero onSearch={handleSearch} />
+      <CondoGrid searchParams={searchParams} />
       
       {/* Editorial Catalog CTA Section */}
       <section className="w-full bg-white dark:bg-[#080808] my-12" aria-label="Call to action">
@@ -65,6 +89,7 @@ export default function Home() {
       <FAQSection />
       <Footer />
       <BackToTop />
+      <Toast />
     </main>
   );
 }

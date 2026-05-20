@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { calculateNomadScore } from '@/utils/scoring';
 
 export default function CondoCard({ condo, index, onClick }) {
   const [hovered, setHovered] = useState(false);
@@ -19,22 +20,16 @@ export default function CondoCard({ condo, index, onClick }) {
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
       onClick={onClick}
-      className="group relative flex flex-col bg-transparent dark:bg-transparent border border-neutral-200/50 dark:border-[#333333] p-3 hover:bg-neutral-50/20 dark:hover:bg-neutral-900/5 transition-all duration-300 cursor-pointer"
+      className="group relative flex flex-col bg-neutral-50/30 dark:bg-neutral-900/10 p-4 rounded-2xl border border-neutral-200/20 dark:border-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-950/40 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-neutral-200/10 dark:hover:shadow-black/20 transition-all duration-500 cursor-pointer"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Micro-Drafting Corner Tick Crosshairs on Card Corners */}
-      <div className="absolute top-1.5 left-2 text-[10px] text-neutral-400 dark:text-[#555] select-none pointer-events-none z-30 font-light font-mono">+</div>
-      <div className="absolute top-1.5 right-2 text-[10px] text-neutral-400 dark:text-[#555] select-none pointer-events-none z-30 font-light font-mono">+</div>
-      <div className="absolute bottom-1.5 left-2 text-[10px] text-neutral-400 dark:text-[#555] select-none pointer-events-none z-30 font-light font-mono">+</div>
-      <div className="absolute bottom-1.5 right-2 text-[10px] text-neutral-400 dark:text-[#555] select-none pointer-events-none z-30 font-light font-mono">+</div>
-
       {/* 
         The Inset Technique:
-        The image container is surrounded by standard padding inside the 1px hairline border, 
+        The image container is surrounded by standard padding inside the card, 
         giving the photo a framed gallery feeling.
       */}
-      <div className="relative aspect-video md:aspect-[4/3] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900 shrink-0 border border-neutral-200/40 dark:border-[#333333]/50">
+      <div className="relative aspect-video md:aspect-[4/3] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900 shrink-0 rounded-xl">
         
         {condo.images && condo.images.length > 0 ? (
           /* Render the photo in full, natural color always with smooth optical hover zoom */
@@ -75,21 +70,30 @@ export default function CondoCard({ condo, index, onClick }) {
 
         {/* Hidden Details: Sleek HUD Console overlays only on hover to keep initial view clean */}
         <div
-          className={`absolute inset-0 bg-black/75 z-20 flex flex-col items-center justify-center gap-2.5 transition-all duration-300 ${
+          className={`absolute inset-0 bg-black/60 backdrop-blur-md z-20 flex flex-col items-center justify-center gap-3 transition-all duration-500 ${
             hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <div className="text-[8px] font-mono uppercase tracking-[0.25em] text-neutral-400 mb-1 border-b border-neutral-800 pb-1 w-24 text-center">
+          <div className="text-[9px] font-mono font-bold uppercase tracking-[0.3em] text-neutral-400 mb-2 border-b border-[#ffffff]/10 pb-1.5 w-28 text-center">
             UNIT SPECS //
           </div>
-          <div className="text-[10px] font-mono tracking-widest text-neutral-200">
-            📐 {condo.area}
-          </div>
-          <div className="text-[10px] font-mono tracking-widest text-neutral-200">
-            🛁 {condo.baths} BATHS
-          </div>
-          <div className="text-[10px] font-mono tracking-widest text-neutral-200">
-            🛏️ {condo.beds} BEDS
+          <div className="grid grid-cols-2 gap-3 w-full px-5">
+            <div className="flex flex-col items-center justify-center py-2.5 bg-[#ffffff]/5 backdrop-blur-md rounded-lg border border-[#ffffff]/5">
+              <span className="text-xs">📐</span>
+              <span className="text-[9px] font-mono tracking-wider text-neutral-300 mt-1">{condo.area}</span>
+            </div>
+            <div className="flex flex-col items-center justify-center py-2.5 bg-[#ffffff]/5 backdrop-blur-md rounded-lg border border-[#ffffff]/5">
+              <span className="text-xs">🛁</span>
+              <span className="text-[9px] font-mono tracking-wider text-neutral-300 mt-1">{condo.baths} BATHS</span>
+            </div>
+            <div className="flex flex-col items-center justify-center py-2.5 bg-[#ffffff]/5 backdrop-blur-md rounded-lg border border-[#ffffff]/5">
+              <span className="text-xs">🛏️</span>
+              <span className="text-[9px] font-mono tracking-wider text-neutral-300 mt-1">{condo.beds} BEDS</span>
+            </div>
+            <div className="flex flex-col items-center justify-center py-2.5 bg-[#25d366]/10 backdrop-blur-md rounded-lg border border-[#25d366]/20">
+              <span className="text-xs">📊</span>
+              <span className="text-[9px] font-mono font-bold tracking-wider text-emerald-400 mt-1">NOMAD: {calculateNomadScore(condo).total}</span>
+            </div>
           </div>
         </div>
 
@@ -115,6 +119,12 @@ export default function CondoCard({ condo, index, onClick }) {
             <p className="text-[8px] uppercase font-bold text-neutral-500 dark:text-neutral-400 tracking-wider mt-1.5 font-mono">
               {condo.street}
             </p>
+            <div className="flex items-center gap-1.5 mt-2.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[8px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400 font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+                Nomad Score: {calculateNomadScore(condo).total}/10
+              </span>
+            </div>
           </div>
           
           {/* Bottom Right: Price in Bold Serif & Specs directly underneath in wide sans-serif */}

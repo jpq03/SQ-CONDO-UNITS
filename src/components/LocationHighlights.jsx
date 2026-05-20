@@ -68,12 +68,12 @@ const LANDMARKS = [
 export default function LocationHighlights() {
   return (
     <section className="bg-white dark:bg-[#080808] border-t border-neutral-200 dark:border-neutral-900" aria-label="Location Highlights">
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-8 border-x border-neutral-200 dark:border-neutral-900 py-20 md:py-28">
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-8 py-20 md:py-28">
 
         {/* Header */}
-        <div className="max-w-2xl mx-auto flex flex-col items-center justify-center text-center mb-20">
-          <p className="text-[10px] font-normal lowercase tracking-[0.25em] text-neutral-400 dark:text-neutral-500 mb-3 border-b border-neutral-200 dark:border-neutral-800 pb-1.5 inline-block">
-            03 • neighborhood
+        <div className="max-w-2xl mx-auto flex flex-col items-center justify-center text-center mb-16">
+          <p className="text-[10px] font-bold lowercase tracking-[0.3em] text-neutral-400 dark:text-neutral-500 mb-3 border-b border-neutral-200 dark:border-neutral-800 pb-1.5 inline-block">
+            02 • neighborhood
           </p>
           <h2
             className="text-3xl md:text-5xl font-black text-neutral-950 dark:text-white mb-4 mt-2 uppercase tracking-tight"
@@ -87,7 +87,7 @@ export default function LocationHighlights() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 w-full max-w-6xl mx-auto justify-center justify-items-center">
           {LANDMARKS.map((landmark, index) => (
             <motion.div
               key={landmark.name}
@@ -95,18 +95,19 @@ export default function LocationHighlights() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.08 }}
-              className="flex flex-col items-center text-center p-6 border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white transition-all duration-300 group cursor-default"
+              className="flex flex-col items-center text-center p-6 bg-neutral-50/20 hover:bg-neutral-50 dark:bg-transparent dark:hover:bg-neutral-900/40 rounded-2xl transition-all duration-300 group cursor-default hover:-translate-y-1 hover:shadow-lg hover:shadow-neutral-200/20 dark:hover:shadow-none"
             >
-              <div className="text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white transition-colors duration-300 mb-4">
+              {/* Icon Container with Round Background */}
+              <div className="mb-4 flex items-center justify-center w-14 h-14 bg-neutral-100/80 dark:bg-neutral-900 text-neutral-400 dark:text-neutral-500 group-hover:text-black dark:group-hover:text-white group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all duration-300 rounded-full">
                 {landmark.icon}
               </div>
-              <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-600 mb-2">
+              <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-600 mb-2 font-mono">
                 {landmark.category}
               </span>
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-black dark:text-white mb-2">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-black dark:text-white mb-3 min-h-[32px] flex items-center justify-center">
                 {landmark.name}
               </h3>
-              <span className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white bg-neutral-100 dark:bg-neutral-900 px-3 py-1">
+              <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-900/80 px-3.5 py-1 rounded-full border border-neutral-200/50 dark:border-neutral-800/40">
                 {landmark.distance}
               </span>
             </motion.div>
