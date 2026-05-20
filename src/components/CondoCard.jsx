@@ -1,11 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { calculateNomadScore } from '@/utils/scoring';
 
 export default function CondoCard({ condo, index, onClick }) {
   const [hovered, setHovered] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const nextImage = (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (condo.images && condo.images.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % condo.images.length);
+    }
+  };
+
+  const prevImage = (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (condo.images && condo.images.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + condo.images.length) % condo.images.length);
+    }
+  };
+
+  const handleCardClick = () => {
+    if (isDragging) return;
+    if (onClick) onClick();
+  };
 
   // Determine if this is the primary listing housing the user's Royal Oceancrest image
   const isPrimary = condo.id === 1;
@@ -19,7 +46,7 @@ export default function CondoCard({ condo, index, onClick }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
-      onClick={onClick}
+      onClick={handleCardClick}
       className="group relative flex flex-col bg-neutral-50/30 dark:bg-neutral-900/10 p-4 rounded-2xl border border-neutral-200/20 dark:border-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-950/40 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-neutral-200/10 dark:hover:shadow-black/20 transition-all duration-500 cursor-pointer"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -29,15 +56,88 @@ export default function CondoCard({ condo, index, onClick }) {
         The image container is surrounded by standard padding inside the card, 
         giving the photo a framed gallery feeling.
       */}
-      <div className="relative aspect-video md:aspect-[4/3] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900 shrink-0 rounded-xl">
+      <div className="relative aspect-video md:aspect-[4/3] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900 shrink-0 rounded-xl group/image">
         
         {condo.images && condo.images.length > 0 ? (
-          /* Render the photo in full, natural color always with smooth optical hover zoom */
-          <img
-            src={condo.images[0]}
-            alt={`${condo.title} showcase`}
-            className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.03]"
-          />
+          <div className="w-full h-full relative overflow-hidden">
+            <motion.div
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.15}
+              onDragStart={() => setIsDragging(true)}
+              onDragEnd={(e, info) => {
+                const threshold = 40;
+                if (info.offset.x < -threshold) {
+                  nextImage(e);
+                } else if (info.offset.x > threshold) {
+                  prevImage(e);
+                }
+                setTimeout(() => setIsDragging(false), 50);
+              }}
+              className="w-full h-full relative cursor-grab active:cursor-grabbing overflow-hidden"
+              style={{ touchAction: 'pan-y' }}
+            >
+              <AnimatePresence initial={false} mode="popLayout">
+                <motion.img
+                  key={currentImageIndex}
+                  src={condo.images[currentImageIndex]}
+                  alt={`${condo.title} showcase`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: 'easeInOut' }}
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                />
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Slide Navigation Arrows (hidden on touch, visible on hover) */}
+            {condo.images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={prevImage}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 dark:bg-black/60 dark:hover:bg-white/95 border border-white/10 dark:hover:border-white text-white dark:hover:text-black flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-all duration-300 z-30 shadow-md hover:scale-105 active:scale-95 cursor-pointer md:flex hidden"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={nextImage}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 dark:bg-black/60 dark:hover:bg-white/95 border border-white/10 dark:hover:border-white text-white dark:hover:text-black flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-all duration-300 z-30 shadow-md hover:scale-105 active:scale-95 cursor-pointer md:flex hidden"
+                  aria-label="Next image"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Elegant Dots Indicator */}
+            {condo.images.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-30 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] px-2.5 py-1 rounded-full border border-white/5">
+                {condo.images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setCurrentImageIndex(i);
+                    }}
+                    className={`w-1 h-1 rounded-full transition-all duration-300 cursor-pointer ${
+                      i === currentImageIndex ? 'w-2.5 bg-white' : 'bg-white/40 hover:bg-white/70'
+                    }`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         ) : (
           /* Stark architectural scale outline drawing matching the high-fashion catalogue theme */
           <div className="w-full h-full flex flex-col items-center justify-center bg-[#F4F4F4] dark:bg-[#0c0c0c] relative overflow-hidden select-none">
