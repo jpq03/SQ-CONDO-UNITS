@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { calculateNomadScore } from '@/utils/scoring';
 
 export default function CondoCard({ condo, index, onClick }) {
@@ -78,16 +79,13 @@ export default function CondoCard({ condo, index, onClick }) {
               style={{ touchAction: 'pan-y' }}
             >
               <AnimatePresence initial={false} mode="popLayout">
-                <motion.img
-                  key={currentImageIndex}
-                  src={condo.images[currentImageIndex]}
-                  alt={`${condo.title} showcase`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35, ease: 'easeInOut' }}
-                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                />
+                <Image
+                      src={condo.images[currentImageIndex]}
+                      alt={`${condo.title} showcase`}
+                      fill
+                      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                      priority={false}
+                    />
               </AnimatePresence>
             </motion.div>
 
