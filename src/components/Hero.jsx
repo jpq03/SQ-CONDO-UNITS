@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import SearchBar from './SearchBar';
+import Image from 'next/image';
 
 const BACKGROUND_SLIDES = [
   'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1600&q=80', // Brutalist Concrete Tower
@@ -61,9 +62,10 @@ export default function Hero({ onSearch }) {
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentSlide === index ? 'opacity-70' : 'opacity-0'
                 }`}
             >
-              <img
+              <Image
                 src={slide}
                 alt={`Architectural Slideshow background ${index + 1}`}
+                fill
                 className="w-full h-full object-cover object-center grayscale contrast-125 brightness-50 pointer-events-none"
               />
             </div>

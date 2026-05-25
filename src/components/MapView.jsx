@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Condo coordinates in Lapu-Lapu City area
+import Image from 'next/image';
 const CONDO_PINS = [
   { id: 1, title: 'ROYAL OCEANCREST', price: 12450000, lat: 10.3103, lng: 123.9494 },
   { id: 2, title: 'THE OBSIDIAN', price: 8900000, lat: 10.3150, lng: 123.9550 },
@@ -190,9 +190,10 @@ export default function MapView({ filtered, onSelectCondo }) {
             <div className="flex gap-4">
               <div className="w-20 h-20 bg-neutral-900 border border-neutral-800 shrink-0 overflow-hidden relative">
                 {activeCondo.images && activeCondo.images.length > 0 ? (
-                  <img
+                  <Image
                     src={activeCondo.images[0]}
                     alt={activeCondo.title}
+                    fill
                     className="w-full h-full object-cover"
                   />
                 ) : (

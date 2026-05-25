@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateNomadScore } from '@/utils/scoring';
+import Image from 'next/image';
 
 export default function ContactDrawer({ isOpen, onClose, condo }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -137,9 +138,10 @@ export default function ContactDrawer({ isOpen, onClose, condo }) {
               {/* Cover Image */}
               <div className="relative w-full aspect-video md:aspect-[16/10] overflow-hidden bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-900">
                 {condo?.images && condo.images.length > 0 ? (
-                  <img
+                  <Image
                     src={condo.images[0]}
                     alt={condo.title}
+                    fill
                     className="w-full h-full object-cover"
                   />
                 ) : (
